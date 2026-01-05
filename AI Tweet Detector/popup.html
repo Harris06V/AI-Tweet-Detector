@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tweet Detector</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 380px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #2c3e50;
+    }
+
+    .container {
+      background: white;
+      margin: 0;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .header p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .toggle-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .toggle-label {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 26px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .stats-section {
+      margin-bottom: 20px;
+    }
+
+    .stats-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .stat-value.ai-detected {
+      color: #ff6b6b;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s ease;
+    }
+
+    .settings-section {
+      margin-bottom: 20px;
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      color: #2c3e50;
+    }
+
+    .setting-input {
+      width: 80px;
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .color-picker {
+      width: 50px;
+      height: 30px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 10px;
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .button-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .button-secondary {
+      background: #f8f9fa;
+      color: #2c3e50;
+      border: 1px solid #ddd;
+    }
+
+    .button-secondary:hover {
+      background: #e9ecef;
+    }
+
+    .footer {
+      padding: 15px 20px;
+      background: #f8f9fa;
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .footer a {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      background: #667eea;
+      color: white;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    .notification {
+      padding: 10px;
+      background: #d4edda;
+      color: #155724;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .notification.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>AI Tweet Detector</h1>
+      <p>Real-time AI content analysis</p>
+    </div>
+
+    <div class="content">
+      <div id="notification" class="notification"></div>
+
+      <!-- Toggle Section -->
+      <div class="toggle-section">
+        <span class="toggle-label">Detection Enabled</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="enableToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Statistics Section -->
+      <div class="stats-section">
+        <div class="stats-title">Statistics</div>
+        <div class="stat-card">
+          <div class="stat-row">
+            <span class="stat-label">Tweets Analyzed</span>
+            <span class="stat-value" id="tweetsAnalyzed">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">AI Detected</span>
+            <span class="stat-value ai-detected" id="aiDetected">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Detection Rate</span>
+            <span class="stat-value" id="detectionRate">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+          </div>
+          <div class="stat-row" style="margin-top: 12px;">
+            <span class="stat-label">Avg. Confidence</span>
+            <span class="stat-value" id="avgConfidence">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Section -->
+      <div class="settings-section">
+        <div class="stats-title">Settings</div>
+        
+        <div class="setting-row">
+          <span class="setting-label">Confidence Sensitivity</span>
+          <input type="number" id="confidenceThreshold" class="setting-input" min="50" max="100" value="70">
+        </div>
+        
+        <div class="setting-row">
+          <span class="setting-label">Show Confidence %</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="showConfidence" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        
+        <div class="setting-row">
+          <span class="setting-label">Highlight Color</span>
+          <input type="color" id="highlightColor" class="color-picker" value="#ff6b6b">
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <button class="button button-primary" id="rescanBtn">Rescan Tweets</button>
+      <button class="button button-secondary" id="resetStatsBtn">Reset Statistics</button>
+    </div>
+
+    <div class="footer">
+      Made for detecting AI-generated content<br>
+      <a href="#" id="aboutLink">About</a> • <a href="#" id="helpLink">Help</a>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
