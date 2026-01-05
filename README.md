@@ -14,7 +14,7 @@ Chrome/Edge:
 2. Go to chrome://extensions/
 3. Turn on Developer mode (top right)
 4. Click Load unpacked
-5. Select the "Ai Tweet Detector" folder
+5. Select the "AI Tweet Detector" folder
 6. Go to twitter.com or x.com
 
 Firefox:
